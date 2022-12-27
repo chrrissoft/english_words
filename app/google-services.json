@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "725985086469",
+    "project_id": "inglish-words",
+    "storage_bucket": "inglish-words.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725985086469:android:6b8abf2620b58ffd45a06c",
+        "android_client_info": {
+          "package_name": "com.chrrissoft.englishwords"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "725985086469-vpkrbqasd62d8ujd9saj3cdaok763h2k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKA2a8LEJV06Q4wJVWnDHMXROjz3bsqKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "725985086469-vpkrbqasd62d8ujd9saj3cdaok763h2k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name" translatable="false">English Words</string>
+    <string name="your_web_client_id">123</string>
+
+
+    <string name="facebook_app_id">485188953738022</string>
+    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="facebook_client_token">0e4d5fd80e27d2d2c248cd85705ac828</string>
+
+    <string name="email_placeholder_auth_screen">email</string>
+    <string name="repeat_pass_placeholder_auth_screen">repeat password</string>
+    <string name="pass_placeholder_auth_screen">password</string>
+
+
+    <string name="create_pass_placeholder_singUp_auth_screen">create a pass</string>
+    <string name="repeat_pass_placeholder_singUp_auth_screen">repeat a pass</string>
+    <string name="auth_email_auth_screen">Go</string>
+
+    <string name="change_to_singin_auth_screen">Sing In</string>
+    <string name="change_to_singup_auth_screen">Sing Up</string>
+
+    <string name="no_account_auth_screen">don\'t have an account?</string>
+    <string name="there_account_auth_screen">do you have an account?</string>
+
+    <string name="special_singIn_word_auth_screen">"Access "</string>
+    <string name="singIn_1_auth_screen">in your account</string>
+
+    <string name="special_singUp_word_auth_screen">"Create "</string>
+    <string name="singUp_1_auth_screen">your account</string>
+
+    <string name="auth_title_3_auth_screen">"with.."</string>
+
+</resources>
