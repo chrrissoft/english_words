@@ -9,7 +9,6 @@ import com.chrrissoft.englishwords.auth.ui.state.AuthProviderResultState.Loading
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderResultState.Success
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderResultState.Error
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderResultState.Cancel
-import com.chrrissoft.englishwords.auth.ui.state.AuthProviderCredential.EmailCredential as UiEmail
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderCredential.GoogleCredential as UiGoogle
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderCredential.FacebookCredential as UiFacebook
 import com.chrrissoft.englishwords.auth.ui.state.AuthScreenState
@@ -23,9 +22,7 @@ import com.chrrissoft.inglishwords.data.auth.AuthProviderResultState.Loading as 
 import com.chrrissoft.inglishwords.data.auth.AuthProviderResultState.Cancel as DataCancel
 import com.chrrissoft.inglishwords.data.auth.AuthProviderResultState.Error as DataError
 import com.chrrissoft.inglishwords.data.auth.FirebaseAuthRepo
-import com.chrrissoft.inglishwords.data.auth.FirebaseAuthRepo.AuthProviders.Email.*
 import com.chrrissoft.inglishwords.data.auth.FirebaseAuthRepo.AuthProviders.Google as DataGoogle
-import com.chrrissoft.inglishwords.data.auth.FirebaseAuthRepo.AuthProviders.Email as DataEmail
 import com.chrrissoft.inglishwords.data.auth.FirebaseAuthRepo.AuthProviders.Facebook as DataFacebook
 import com.chrrissoft.inglishwords.data.auth.GoogleAuthRepo
 import com.facebook.login.LoginManager
@@ -58,9 +55,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             googleAuthRepo
                 .singIn(this)
-                .transform<DataAuthProviderResultState, Nothing> {
-                    updateGoogleAuthState(it)
-                }
+                .collect { updateGoogleAuthState(it) }
         }
     }
 
@@ -68,9 +63,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             googleAuthRepo
                 .singUp(this)
-                .transform<DataAuthProviderResultState, Nothing> {
-                    updateGoogleAuthState(it)
-                }
+                .collect { updateGoogleAuthState(it) }
         }
     }
 
@@ -103,45 +96,44 @@ class AuthViewModel @Inject constructor(
 
     fun beginEmailSingIn(state: SingInEmailState) {
         if (!validateEmailSingInState(state)) return
-//        authInFirebase(UiEmail)
+        singInEmail(state.email.text, state.pass.text)
     }
 
     fun beginEmailSingUp(state: SingUpEmailState) {
         if (!validateEmailSingUpState(state)) return
-//        authInFirebase(UiEmail)
+        singUpEmail(state.email.text, state.pass2.text)
     }
 
-    fun authInFirebase(provider: AuthProviderCredential) {
-        when (provider) {
-            is UiEmail -> {
-                firebaseAuthRepo.auth(
-                    scope = viewModelScope,
-                    provider = when (_uiState.value.login) {
-                        SingIn -> DataEmail(
-                            _uiState.value.singInEmailState.email.text,
-                            _uiState.value.singInEmailState.pass.text,
-                            Type.SingIn
-                        )
-                        SingUp -> DataEmail(
-                            _uiState.value.singInEmailState.email.text,
-                            _uiState.value.singInEmailState.pass.text,
-                            Type.SingIn
-                        )
-                    }
-                )
+    fun authInFirebaseWithProvider(provider: AuthProviderCredential) {
+        viewModelScope.launch {
+            when (provider) {
+                is UiFacebook -> {
+                    firebaseAuthRepo
+                        .authWithProvider(DataFacebook(provider.credential), this)
+                        .collect { TODO() }
+                }
+                is UiGoogle -> {
+                    firebaseAuthRepo
+                        .authWithProvider(DataGoogle(provider.credential), this)
+                        .collect { TODO() }
+                }
             }
-            is UiFacebook -> {
-                firebaseAuthRepo.auth(
-                    scope = viewModelScope,
-                    provider = DataFacebook(provider.credential)
-                )
-            }
-            is UiGoogle -> {
-                firebaseAuthRepo.auth(
-                    scope = viewModelScope,
-                    provider = DataGoogle(provider.credential),
-                )
-            }
+        }
+    }
+
+    private fun singInEmail(user: String, pass: String) {
+        viewModelScope.launch {
+            firebaseAuthRepo
+                .singInEmail(user, pass, this)
+                .collect { TODO() }
+        }
+    }
+
+    private fun singUpEmail(user: String, pass: String) {
+        viewModelScope.launch {
+            firebaseAuthRepo
+                .singUpEmail(user, pass, this)
+                .collect { TODO() }
         }
     }
 

@@ -1,4 +1,4 @@
-package com.chrrissoft.englishwords.di
+package com.chrrissoft.englishwords.auth.di
 
 import android.content.Context
 import com.chrrissoft.englishwords.InglishWordsApp

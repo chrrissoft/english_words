@@ -1,4 +1,4 @@
-package com.chrrissoft.englishwords.di
+package com.chrrissoft.englishwords.auth.di
 
 import com.chrrissoft.inglishwords.data.auth.FacebookAuthRepo
 import com.chrrissoft.englishwords.auth.framework.FacebookAuthRepoImpl

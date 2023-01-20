@@ -1,4 +1,4 @@
-package com.chrrissoft.englishwords.di
+package com.chrrissoft.englishwords.auth.di
 
 import com.facebook.CallbackManager
 import com.facebook.login.LoginManager

@@ -1,12 +1,13 @@
 package com.chrrissoft.englishwords.auth.framework
 
-import com.chrrissoft.englishwords.di.SingInRequest
-import com.chrrissoft.englishwords.di.SingUpRequest
+import com.chrrissoft.englishwords.auth.di.SingInRequest
+import com.chrrissoft.englishwords.auth.di.SingUpRequest
 import com.chrrissoft.inglishwords.data.auth.GoogleAuthRepo
 import com.chrrissoft.inglishwords.data.auth.AuthProviderResultState
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
@@ -27,11 +28,11 @@ class GoogleAuthRepoImpl @Inject constructor(
             emit(AuthProviderResultState.Loading)
 
             client.beginSignIn(singInRequest).addOnSuccessListener {
-                scope.launch { emit(AuthProviderResultState.Success(it)) }
+                scope.launch(IO) { emit(AuthProviderResultState.Success(it)) }
             }.addOnCanceledListener {
-                scope.launch { emit(AuthProviderResultState.Cancel) }
+                scope.launch(IO) { emit(AuthProviderResultState.Cancel) }
             }.addOnFailureListener {
-                scope.launch { emit(AuthProviderResultState.Error(it)) }
+                scope.launch(IO) { emit(AuthProviderResultState.Error(it)) }
             }
         }
     }
@@ -44,15 +45,15 @@ class GoogleAuthRepoImpl @Inject constructor(
             println("begin auth")
 
             client.beginSignIn(singUpRequest).addOnSuccessListener {
-                scope.launch { emit(AuthProviderResultState.Success(it)) }
+                scope.launch(IO) { emit(AuthProviderResultState.Success(it)) }
             }
 
             client.beginSignIn(singUpRequest).addOnCanceledListener {
-                scope.launch { emit(AuthProviderResultState.Cancel) }
+                scope.launch(IO) { emit(AuthProviderResultState.Cancel) }
             }
 
             client.beginSignIn(singUpRequest).addOnFailureListener {
-                scope.launch { emit(AuthProviderResultState.Error(it)) }
+                scope.launch(IO) { emit(AuthProviderResultState.Error(it)) }
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.chrrissoft.englishwords.di
+package com.chrrissoft.englishwords.auth.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth

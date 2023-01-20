@@ -45,15 +45,13 @@ fun AuthScreen(
                 activity = activity,
                 client = viewModel.client,
                 resultState = uiState.authProviderResultState,
-                onSendGoogleCredential = { viewModel.authInFirebase(GoogleCredential(it)) }
+                onSendGoogleCredential = { viewModel.authInFirebaseWithProvider(GoogleCredential(it)) }
             )
         }
         Facebook -> {
             FacebookAuth(
-                activity = activity,
-                manager = viewModel.loginManager,
                 resultState = uiState.authProviderResultState,
-                onSendCredential = { viewModel.authInFirebase(FacebookCredential(it)) }
+                onSendCredential = { viewModel.authInFirebaseWithProvider(FacebookCredential(it)) }
             )
         }
         None -> { /* witting for user select anyone */

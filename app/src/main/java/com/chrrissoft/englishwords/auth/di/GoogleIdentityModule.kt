@@ -1,4 +1,4 @@
-package com.chrrissoft.englishwords.di
+package com.chrrissoft.englishwords.auth.di
 
 import com.chrrissoft.englishwords.InglishWordsApp
 import com.chrrissoft.englishwords.R

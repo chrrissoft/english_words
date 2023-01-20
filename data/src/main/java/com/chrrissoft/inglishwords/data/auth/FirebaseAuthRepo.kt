@@ -8,17 +8,20 @@ interface FirebaseAuthRepo {
     sealed interface AuthProviders {
         data class Google<T>(val credentials: T) : AuthProviders
         data class Facebook<T>(val credentials: T) : AuthProviders
-        data class Email(
-            val email: String,
-            val pass: String,
-            val type: Type
-        ) : AuthProviders { enum class Type { SingIn, SingUp } }
     }
 
-    fun auth(
+    fun authWithProvider(
         provider: AuthProviders,
         scope: CoroutineScope
     ): Flow<FirebaseAuthResultState>
+
+    fun singUpEmail(
+        user: String, pass: String, scope: CoroutineScope
+    ) : Flow<FirebaseAuthResultState>
+
+    fun singInEmail(
+        user: String, pass: String, scope: CoroutineScope
+    ) : Flow<FirebaseAuthResultState>
 
     fun logOut()
 }
