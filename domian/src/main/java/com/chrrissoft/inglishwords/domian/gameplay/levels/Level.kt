@@ -11,7 +11,7 @@ interface Level {
     val editorState: StateFlow<EditorState>
     val keyboardState: StateFlow<KeyboardState>
 
-    val index: Int
+    val number: Int
 
     fun resetEditor(word: String)
     fun resetKeyboard(word: String, language: KeyboardLanguage)

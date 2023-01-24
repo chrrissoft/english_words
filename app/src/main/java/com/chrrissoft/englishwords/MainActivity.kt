@@ -13,6 +13,7 @@ import com.chrrissoft.englishwords.auth.ui.AuthViewModel
 import com.chrrissoft.englishwords.gameplay.ui.GamePlayScreen
 import com.chrrissoft.englishwords.navigation.App
 import com.chrrissoft.englishwords.theme.EnglishWordsTheme
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -38,6 +39,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun InglishWordsApp(content: @Composable () -> Unit) {
+    val remember = rememberSystemUiController()
+    val color = MaterialTheme.colorScheme.secondaryContainer
+    LaunchedEffect(Unit) {
+        remember.setStatusBarColor(color)
+    }
     EnglishWordsTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),

@@ -1,5 +1,8 @@
 package com.chrrissoft.inglishwords.domian.gameplay.levels
 
+import com.chrrissoft.inglishwords.domian.gameplay.GamePlayPlayer
+import com.chrrissoft.inglishwords.domian.gameplay.GameState
+import com.chrrissoft.inglishwords.domian.gameplay.Steps
 import com.chrrissoft.inglishwords.domian.gameplay.editor.EditorReport
 import com.chrrissoft.inglishwords.domian.gameplay.editor.EditorState
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardLanguage
@@ -8,7 +11,6 @@ import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsSettings.Order.*
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.TargetWord
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.TranslatedWord
 import com.chrrissoft.inglishwords.domian.gameplay.report.WordReport
-import com.chrrissoft.inglishwords.domian.gameplay.util.logger
 import com.chrrissoft.inglishwords.domian.gameplay.util.margeInterleave
 import com.chrrissoft.inglishwords.domian.gameplay.util.thereIsNext
 import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWordImpl
@@ -25,6 +27,7 @@ import com.chrrissoft.inglishwords.domian.gameplay.word.Word as InputWord
 class LevelsManagerImpl(
     private val levels: Levels,
     private val settings: LevelsSettings,
+    private val player: GamePlayPlayer
 ) : LevelsManager {
 
     private val scope = MainScope()
@@ -36,7 +39,7 @@ class LevelsManagerImpl(
 
     private val reports = mutableListOf<WordReport>()
 
-    private val _state = MutableStateFlow(LevelsManagerState())
+    private val _state = MutableStateFlow(GameState(Steps(levels.totalLevels)))
     override val state = _state.asStateFlow()
 
     private data class SplitWord(
@@ -57,6 +60,7 @@ class LevelsManagerImpl(
                 onEditorFailed(it) {
                     addFailureWord(currentWord, level)
                     incrementFailedWordsState()
+                    playFailedWord()
                     advance()
                 }
 
@@ -67,6 +71,7 @@ class LevelsManagerImpl(
                         decrementFailedWordsState()
                     }
                     addReport(report)
+                    playWinWord()
                     advance()
                 }
             },
@@ -116,7 +121,7 @@ class LevelsManagerImpl(
     private fun generateWordReport(level: Level): WordReport {
         val editorReport = getEditorReport(level)
         return WordReportImpl(
-            level = level.index,
+            level = level.number,
             text = currentWord.text,
             time = editorReport.time,
             index = currentWord.index,
@@ -135,11 +140,11 @@ class LevelsManagerImpl(
 
     private fun advance() {
         val wordUpdated = thereNextWord(currentWord) {
+            updateWordNumberState(words.indexOf(it).plus(1))
             nextWord(levels.currentLevel, it)
-            logger("on wordUpdated: ${it.text}")
+            updateState()
         }
 
-        logger("on wordUpdated result: $wordUpdated")
         if (wordUpdated) return
 
         val setMissWords = thereFailedWord { words ->
@@ -147,6 +152,7 @@ class LevelsManagerImpl(
             val margeWords = margeWords(split.target, split.translation)
             setFailedWords(levels.currentLevel, margeWords)
             updateReplacementState(value = true)
+            updateState()
         }
 
         if (setMissWords) return
@@ -155,14 +161,36 @@ class LevelsManagerImpl(
             updateCurrentLevel(level)
             resetWords(level, inputWords)
             updateReplacementState(value = false)
-            logger("on setLevel: ${level.index}")
             observeCurrentLevel(level)
+            playNextLevel()
+            updateState()
         }
 
-        logger("on setLevel result: $setLevel")
         if (setLevel) return
 
         setEnd()
+        playEndGame()
+    }
+
+    private fun updateState() {
+        _state.update {
+            it.copy(
+                translatedWord = currentWord.translated,
+                words = it.words.advance()
+            )
+        }
+    }
+
+    private fun playWinWord() {
+        player.playWinWord()
+    }
+
+    private fun playNextLevel() {
+        player.playNextLevel()
+    }
+
+    private fun playEndGame() {
+        player.playEndGame()
     }
 
     private fun updateReplacementState(value: Boolean) {
@@ -170,7 +198,8 @@ class LevelsManagerImpl(
     }
 
     private fun thereNextWord(
-        word: Word, block: (Word) -> Unit): Boolean {
+        word: Word, block: (Word) -> Unit
+    ): Boolean {
         return words.thereIsNext(word) {
             block(it)
         }
@@ -195,8 +224,16 @@ class LevelsManagerImpl(
         currentWord = word
     }
 
+    private fun updateWordNumberState(n: Int) {
+        _state.update {
+            it.copy(words = it.words.copy(current = n))
+        }
+    }
+
     private fun updateCurrentLevel(level: Level) {
-        _state.update { it.copy(level = level.index) }
+        _state.update {
+            it.copy(level = it.level.copy(current = level.number))
+        }
     }
 
     private fun resetKeyboard(level: Level, word: String, lang: KeyboardLanguage) {
@@ -227,6 +264,10 @@ class LevelsManagerImpl(
             report = sumDeleteReport(it, report)
         }
         failedWords[word] = report
+    }
+
+    private fun playFailedWord() {
+        player.playFailedWord()
     }
 
     private fun onReplacement(block: () -> Unit) {
@@ -290,6 +331,19 @@ class LevelsManagerImpl(
             }
         )
         resetEditor(levels.firstLevel, currentWord.text)
+        setUpState(words.size, currentWord.translated)
+    }
+
+    private fun setUpState(
+        wordsNumber: Int,
+        translatedWord: String,
+    ) {
+        _state.update {
+            it.copy(
+                translatedWord = translatedWord,
+                words = Steps(total = wordsNumber),
+            )
+        }
     }
 
     private fun initializeList(words: List<InputWord>) {
@@ -303,6 +357,7 @@ class LevelsManagerImpl(
             .mapIndexed { i, word ->
                 TranslatedWord(
                     index = i,
+                    translated = word.text,
                     text = word.translation.text,
                     lang = when (word.translation) {
                         is SpanishTranslatedWordImpl -> Word.Language.Spanish
@@ -313,6 +368,7 @@ class LevelsManagerImpl(
             TargetWord(
                 index = i,
                 text = word.text,
+                translated = word.translation.text,
                 lang = when (word) {
                     is InputWord.EnglishWord -> Word.Language.English
                 }

@@ -54,3 +54,17 @@ fun <T> List<T>.interleave(list: List<T>): List<T> {
 fun <T> margeInterleave(l1: List<T>, l2: List<T>): List<T> {
     return l1.interleave(l2)
 }
+
+fun <E> List<E>.modifiedElement(e: E, block: (E) -> E): List<E> {
+
+    var list = this
+
+    this.forEach {
+        if (it == e) {
+            list = list.replace(it, block(it))
+        }
+    }
+
+    return list
+
+}

@@ -55,15 +55,17 @@ private fun TextKey(
     text: String,
     onPress: () -> Unit,
     modifier: Modifier = Modifier,
+    background: Color = colorScheme.background,
 ) {
+
+
     Key(
         width = width,
         height = height,
         modifier = modifier,
-        content = {
-            KeyText(text)
-        },
+        background = background,
         onPress = { onPress() },
+        content = { KeyText(text) },
     )
 }
 
@@ -93,7 +95,9 @@ private fun TextLimitedKey(
             Text(
                 "$count",
                 fontSize = 10.sp,
-                modifier = Modifier.align(TopEnd).padding(top = 2.dp, end = 2.dp),
+                modifier = Modifier
+                    .align(TopEnd)
+                    .padding(top = 2.dp, end = 2.dp),
                 color = colorScheme.surfaceTint,
                 fontWeight = FontWeight.Medium,
             )
@@ -148,6 +152,27 @@ private fun DeleteKey(
 }
 
 @Composable
+private fun SelectableKey(
+    width: Dp,
+    height: Dp,
+    text: String,
+    selected: Boolean,
+    onPress: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val color = if (selected) colorScheme.errorContainer
+    else colorScheme.background
+    TextKey(
+        text = text,
+        width = width,
+        height = height,
+        onPress = onPress,
+        background = color,
+        modifier = modifier
+    )
+}
+
+@Composable
 fun SpacerKey(
     width: Dp,
     height: Dp,
@@ -169,7 +194,7 @@ fun BoxScope.Keys(
     deleteWidth: Dp,
     magicWidth: Dp,
     spacerWidth: Dp,
-    keys: List<Key>,
+    keys: List<Key<*>>,
 ) {
     keys.forEach {
         when (it) {
@@ -196,7 +221,8 @@ fun BoxScope.Keys(
                         )
                     },
                     count = it.stack.size,
-                    text = it.text, onPress = { it.onClick() },
+                    text = it.text,
+                    onPress = { it.onClick() },
                 )
             }
             is TextKey -> {
@@ -209,7 +235,8 @@ fun BoxScope.Keys(
                             y = size.height.times(it.coordinates.y).toInt()
                         )
                     },
-                    text = it.text, onPress = { it.onClick() },
+                    text = it.text,
+                    onPress = { it.onClick() },
                 )
             }
             is MagicKey -> {
@@ -236,6 +263,20 @@ fun BoxScope.Keys(
                             y = size.height.times(it.coordinates.y).toInt()
                         )
                     },
+                )
+            }
+            is SelectableKey -> {
+                SelectableKey(
+                    width = width,
+                    height = height,
+                    selected = it.selected,
+                    modifier = Modifier.align { _, size, _ ->
+                        IntOffset(
+                            x = size.width.times(it.coordinates.x).toInt(),
+                            y = size.height.times(it.coordinates.y).toInt()
+                        )
+                    },
+                    text = it.text, onPress = { it.onClick() },
                 )
             }
         }

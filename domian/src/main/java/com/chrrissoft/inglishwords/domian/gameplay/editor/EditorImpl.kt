@@ -39,6 +39,10 @@ class EditorImpl(
         return userText == split
     }
 
+    override fun getWord(): String {
+        return word
+    }
+
     override fun deleteText(): String? {
         if (_state.value.userText.isEmpty()) return null
         val char = _state.value.userText.last().toString()
@@ -89,7 +93,7 @@ class EditorImpl(
      * if the setting limit is reached
      * */
     private fun isFailed() {
-        if (_state.value.mistakes == 4) {
+        if (_state.value.mistakes == 3) {
             _state.update { it.copy(failed = true) }
         }
     }

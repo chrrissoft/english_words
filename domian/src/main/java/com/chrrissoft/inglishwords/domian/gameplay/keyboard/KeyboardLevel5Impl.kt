@@ -1,125 +1,84 @@
 package com.chrrissoft.inglishwords.domian.gameplay.keyboard
 
+import com.chrrissoft.inglishwords.domian.gameplay.GamePlayPlayer
 import com.chrrissoft.inglishwords.domian.gameplay.editor.Editor
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.Coordinates.Companion.EnglishStructure
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.Coordinates.Companion.SpanishStructure
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.Key.*
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.Keyboard.KeyboardLevel5
-import com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardLanguage.English
-import com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardLanguage.Spanish
+import com.chrrissoft.inglishwords.domian.gameplay.util.modifiedElement
 import com.chrrissoft.inglishwords.domian.gameplay.util.shuffled
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
 class KeyboardLevel5Impl(
-    private val editor: Editor,
-) : KeyboardLevel5 {
+    private val editor: Editor, player: GamePlayPlayer
+) : KeyboardLevel5(editor, player) {
 
-    private val _state =
-        MutableStateFlow(KeyboardState(buildStructure(English)))
-    override val state = _state.asStateFlow()
-
-    private inner class TextKeyImpl(
+    inner class SelectableKeyImpl(
         override val text: String,
+        override val selectable: Boolean,
         override val coordinates: Coordinates,
-    ) : TextKey {
-        override fun onClick() {
-            setText(text)
-        }
-    }
-
-    private inner class DeleteKeyImpl(
-        override val coordinates: Coordinates
-    ) : DeleteKey {
-        override fun onClick() {
-            deleteText()
-        }
-    }
-
-    private inner class SpacerKeyImpl(
-        override val coordinates: Coordinates
-    ) : SpacerKey {
-        override fun onClick() {}
-    }
-
-    private inner class MagicKeyImpl(
-        override val coordinates: Coordinates,
-        override var breaks: Int,
-    ) : MagicKey {
-        override fun onClick() {
-            thereAreLettersBreaks { letter ->
-                findKey(letter).onClick()
-                _state.update {
-                    val decrement = it.breaks - 1
-                    breaks = decrement
-                    it.copy(breaks = decrement)
+        override val selected: Boolean = false,
+    ) : SelectableKey {
+        override fun onClick(): SelectedResult {
+            val isNext =
+                editor.getNextCorrectLetter() == text
+            return when (selectable) {
+                true -> if (isNext) {
+                    makeSelected()
+                    setText(text)
+                    SelectedResult.NEXT_WORD
+                } else {
+                    makeSelected()
+                    SelectedResult.SELECTED
+                }
+                false -> {
+                    setText(text)
+                    SelectedResult.UNSELECT
                 }
             }
         }
-    }
 
-    private fun setText(text: String): Boolean {
-        return editor.setText(text)
-    }
-
-    override fun reset(word: String, language: KeyboardLanguage) {
-        _state.update {
-            it.copy(
-                breaks = KeyboardState.BREAKS_LIMIT,
-                structure = buildStructure(language),
-            )
+        private fun makeSelected() {
+            mutableState.update { state ->
+                state.copy(structure = state.structure.modifiedElement(this) {
+                    it as SelectableKeyImpl
+                    SelectableKeyImpl(it.text, it.selectable, it.coordinates, true)
+                })
+            }
         }
     }
 
-    private fun deleteText() {
+    override fun deleteText() {
         editor.deleteText()
     }
 
-    private fun thereAreLettersBreaks(block: (String) -> Unit) {
-        val letter = editor.getNextCorrectLetter()
-        if (_state.value.breaks != 0) block(letter)
-    }
-
-    private fun findKey(char: String): TextKeyImpl {
-        val key = _state.value.structure.first {
-            it as TextKeyImpl
+    override fun findKey(char: String): SelectableKeyImpl {
+        val key = mutableState.value.structure.first {
+            it as SelectableKeyImpl
             it.text == char
         }
-        key as TextKeyImpl
+        key as SelectableKeyImpl
         return key
     }
 
-    private fun buildStructure(lang: KeyboardLanguage): List<Key> {
-        return when (lang) {
-            English -> buildEnglishStructure()
-            Spanish -> buildSpanishStructure()
-        }
-    }
-
-    private fun buildEnglishStructure(): List<Key> {
+    override fun buildEnglishStructure(word: String): List<Key<*>> {
         return buildList {
             EnglishStructure.coordinates.shuffled().forEach { map ->
-                add(TextKeyImpl(map.key, map.value))
+                val selectable = word.contains(map.key)
+                add(SelectableKeyImpl(map.key, selectable, map.value))
             }
         }.plus(buildOthersKeys())
     }
 
-    private fun buildSpanishStructure(): List<Key> {
+    override fun buildSpanishStructure(word: String): List<Key<*>> {
         return buildList {
             SpanishStructure.coordinates.shuffled().forEach { map ->
-                add(TextKeyImpl(map.key, map.value))
+                val selectable = word.contains(map.key)
+                add(SelectableKeyImpl(map.key, selectable, map.value))
             }
         }.plus(buildOthersKeys())
-    }
-
-    private fun buildOthersKeys(): List<Key> {
-        return buildList {
-            add(DeleteKeyImpl(Coordinates.deleteCoordinates))
-            add(MagicKeyImpl(Coordinates.magicCoordinates, KeyboardState.BREAKS_LIMIT))
-            add(SpacerKeyImpl(Coordinates.spacerCoordinates))
-        }
     }
 
 }

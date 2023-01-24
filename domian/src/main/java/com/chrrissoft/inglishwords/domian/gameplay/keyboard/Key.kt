@@ -2,24 +2,36 @@ package com.chrrissoft.inglishwords.domian.gameplay.keyboard
 
 import java.util.*
 
-sealed interface Key {
+sealed interface Key <T> {
 
-    fun onClick()
+    fun onClick() : T
 
     val coordinates: Coordinates
 
-    interface DeleteKey : Key
-    interface SpacerKey : Key
+    interface DeleteKey : Key<Unit>
+    interface SpacerKey : Key<Unit>
 
-    interface MagicKey : Key {
+    interface MagicKey : Key<Unit> {
         val breaks: Int
     }
-    interface TextKey : Key {
+
+    interface TextKey : Key<Boolean> {
         val text: String
     }
-    interface TextLimitedKey : Key {
+
+    interface SelectableKey : Key<SelectedResult> {
+        val text: String
+        val selected: Boolean
+        val selectable: Boolean
+    }
+
+    interface TextLimitedKey : Key<Boolean> {
         val text: String
         val stack: Stack<String>
     }
 
+}
+
+enum class SelectedResult {
+    UNSELECT, SELECTED, NEXT_WORD
 }

@@ -30,4 +30,9 @@
 
     <string name="auth_title_3_auth_screen">"with.."</string>
 
+
+
+    <!--  game play  -->
+    <string name="levels_step__gameplay">level number %1$s of %2$s</string>
+
 </resources>

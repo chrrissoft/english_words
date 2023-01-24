@@ -2,6 +2,7 @@ package com.chrrissoft.englishwords.gameplay.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chrrissoft.inglishwords.domian.gameplay.GamePlayPlayer
 import com.chrrissoft.inglishwords.domian.gameplay.GamePlayImpl
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Levels
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsManagerImpl
@@ -17,11 +18,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GamePlayViewModel @Inject constructor() : ViewModel() {
+class GamePlayViewModel @Inject constructor(
+    player: GamePlayPlayer
+) : ViewModel() {
 
     private val settings = LevelsSettingsImpl()
-    private val levels = Levels()
-    private val manager = LevelsManagerImpl(levels, settings)
+    private val levels = Levels(player)
+    private val manager = LevelsManagerImpl(levels, settings, player)
     private val list = buildList {
         add(EnglishWord("see", SpanishTranslatedWordImpl("ver")))
         add(EnglishWord("love", SpanishTranslatedWordImpl("amor")))
@@ -41,8 +44,10 @@ class GamePlayViewModel @Inject constructor() : ViewModel() {
                         editor = state.editor,
                         keyboard = state.keyboard,
                         level = state.level,
+                        words = state.words,
+                        translated = state.translatedWord,
                         replacement = state.replacement,
-                        failed = state.failed,
+                        failures = state.failed,
                     )
                 }
             }

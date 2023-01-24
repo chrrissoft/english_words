@@ -11,11 +11,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.Key
 
-private const val KEYBOARD_HEIGHT_PERCENTAGE = 3.4
+private const val KEYBOARD_HEIGHT_PERCENTAGE = 3
 
 @Composable
 fun Keyboard(
-    keys: List<Key>,
+    keys: List<Key<*>>,
     modifier: Modifier = Modifier,
 ) {
 
@@ -32,7 +32,7 @@ fun Keyboard(
         modifier = modifier
             .width(keyboardWidth)
             .height(keyboardHeight)
-            .background(colorScheme.surfaceVariant)
+            .background(colorScheme.surfaceVariant.copy(alpha = .2f))
     ) {
         Keys(
             keys = keys,

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class LevelImp(
-    override val index: Int,
+    override val number: Int,
     private val editor: Editor,
     private val keyboard: Keyboard,
 ) : Level {

@@ -16,6 +16,13 @@ interface Editor {
     fun setText(text: String): Boolean
 
     /**
+     * get the current word in the editor. is user in
+     * [com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardLevel5Impl]
+     * to make its selectable key feature
+     * */
+    fun getWord(): String
+
+    /**
      * height oder function than is used for the keyboard
      * tell with this editor. is used to delete the last
      * letter on the text editor state.
