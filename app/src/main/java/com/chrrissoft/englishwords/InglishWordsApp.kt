@@ -9,7 +9,7 @@ import dagger.hilt.android.HiltAndroidApp
 class InglishWordsApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        FacebookSdk.sdkInitialize(applicationContext);
-        AppEventsLogger.activateApp(this);
+        FacebookSdk.sdkInitialize(applicationContext)
+        AppEventsLogger.activateApp(this)
     }
 }

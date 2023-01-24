@@ -1,22 +1,14 @@
 package com.chrrissoft.englishwords.auth.ui
 
 import android.app.Activity
-import android.content.IntentSender
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartIntentSenderForResult
 import androidx.compose.runtime.Composable
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.startIntentSenderForResult
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderResultState
 import com.chrrissoft.englishwords.auth.ui.state.AuthProviderResultState.*
-import com.google.android.gms.auth.api.identity.BeginSignInResult
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.auth.api.identity.SignInCredential
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.GoogleAuthProvider
 
 private const val TAG = "ShowOneTapScreen"
 
