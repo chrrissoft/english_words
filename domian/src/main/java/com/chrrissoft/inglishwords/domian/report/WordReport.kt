@@ -1,4 +1,4 @@
-package com.chrrissoft.inglishwords.domian.gameplay.report
+package com.chrrissoft.inglishwords.domian.report
 
 
 /**

@@ -1,10 +1,13 @@
 package com.chrrissoft.inglishwords.domian.gameplay
 
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsManager
-import com.chrrissoft.inglishwords.domian.gameplay.report.SessionReporter
-import com.chrrissoft.inglishwords.domian.gameplay.report.WordReport
+import com.chrrissoft.inglishwords.domian.report.SessionReporter
+import com.chrrissoft.inglishwords.domian.report.WordReport
 import com.chrrissoft.inglishwords.domian.gameplay.word.Word
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 

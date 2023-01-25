@@ -7,7 +7,7 @@ import com.chrrissoft.inglishwords.domian.gameplay.GamePlayImpl
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Levels
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsManagerImpl
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsSettingsImpl
-import com.chrrissoft.inglishwords.domian.gameplay.report.SessionReporterImpl
+import com.chrrissoft.inglishwords.domian.report.SessionReporterImpl
 import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWordImpl
 import com.chrrissoft.inglishwords.domian.gameplay.word.Word.EnglishWord
 import dagger.hilt.android.lifecycle.HiltViewModel

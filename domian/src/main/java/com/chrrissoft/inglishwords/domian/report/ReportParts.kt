@@ -1,8 +1,8 @@
-package com.chrrissoft.inglishwords.domian.gameplay.report
+package com.chrrissoft.inglishwords.domian.report
 
 import kotlin.time.Duration
 
-interface Report {
+interface ReportParts {
     val name: String
     val mistakes: Int
     val failures: Int

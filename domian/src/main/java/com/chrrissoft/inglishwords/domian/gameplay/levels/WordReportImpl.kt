@@ -1,6 +1,6 @@
 package com.chrrissoft.inglishwords.domian.gameplay.levels
 
-import com.chrrissoft.inglishwords.domian.gameplay.report.WordReport
+import com.chrrissoft.inglishwords.domian.report.WordReport
 
 internal data class WordReportImpl(
     override val time: Long,

@@ -10,7 +10,7 @@ import com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardState
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsSettings.Order.*
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.TargetWord
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.TranslatedWord
-import com.chrrissoft.inglishwords.domian.gameplay.report.WordReport
+import com.chrrissoft.inglishwords.domian.report.WordReport
 import com.chrrissoft.inglishwords.domian.gameplay.util.margeInterleave
 import com.chrrissoft.inglishwords.domian.gameplay.util.thereIsNext
 import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWordImpl

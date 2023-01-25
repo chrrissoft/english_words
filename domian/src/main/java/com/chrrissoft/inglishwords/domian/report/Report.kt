@@ -1,7 +1,7 @@
-package com.chrrissoft.inglishwords.domian.gameplay.report
+package com.chrrissoft.inglishwords.domian.report
 
 
-interface CompleteReport {
+interface Report {
 
     val nativeReport: ReportStructure
     val targetReport: ReportStructure
