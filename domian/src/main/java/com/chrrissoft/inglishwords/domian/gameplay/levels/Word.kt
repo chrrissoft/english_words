@@ -3,7 +3,7 @@ package com.chrrissoft.inglishwords.domian.gameplay.levels
 internal sealed interface Word {
     val index: Int
     val text: String
-    val translated: String
+    val translation: String
     val lang: Language
 
     enum class Language {
@@ -14,13 +14,13 @@ internal sealed interface Word {
         override val index: Int,
         override val text: String,
         override val lang: Language,
-        override val translated: String,
+        override val translation: String,
     ) : Word
 
-    data class TranslatedWord(
+    data class NativeWord(
         override val index: Int,
         override val text: String,
         override val lang: Language,
-        override val translated: String,
+        override val translation: String,
     ) : Word
 }

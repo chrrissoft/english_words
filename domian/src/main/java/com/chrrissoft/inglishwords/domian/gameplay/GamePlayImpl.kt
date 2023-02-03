@@ -1,13 +1,13 @@
 package com.chrrissoft.inglishwords.domian.gameplay
 
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsManager
+import com.chrrissoft.inglishwords.domian.gameplay.levels.TargetWordResultImpl
 import com.chrrissoft.inglishwords.domian.report.SessionReporter
-import com.chrrissoft.inglishwords.domian.report.WordReport
+import com.chrrissoft.inglishwords.domian.report.WordResult
 import com.chrrissoft.inglishwords.domian.gameplay.word.Word
+import com.chrrissoft.inglishwords.domian.report.WordResult.NativeText
+import com.chrrissoft.inglishwords.domian.report.WordResult.TargetText
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
@@ -26,18 +26,19 @@ class GamePlayImpl(
         onStateChange {
             if (it.end) {
                 addReports(getReports())
+                sessionReporter.save()
                 levelsManager.destroy()
             }
         }
     }
 
-    private fun addReports(report: List<WordReport>) {
-        report.forEach {
-            sessionReporter.addWordReport(it)
-        }
+    private fun addReports(report: List<WordResult>) {
+//        report.forEach {
+//            sessionReporter.addWordReport(it)
+//        }
     }
 
-    private fun getReports(): List<WordReport> {
+    private fun getReports(): List<WordResult> {
         return levelsManager.getReports()
     }
 

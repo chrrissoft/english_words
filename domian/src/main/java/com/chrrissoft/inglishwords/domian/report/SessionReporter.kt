@@ -3,8 +3,8 @@ package com.chrrissoft.inglishwords.domian.report
 
 interface SessionReporter {
 
-    fun getCompleteReport(): Report
+    fun save()
 
-    fun addWordReport(data: WordReport)
+    fun addWordReport(data: WordResult)
 
 }

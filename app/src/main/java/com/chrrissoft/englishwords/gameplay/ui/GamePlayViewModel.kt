@@ -2,14 +2,16 @@ package com.chrrissoft.englishwords.gameplay.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.chrrissoft.inglishwords.data.session.SessionReportSaverImpl
 import com.chrrissoft.inglishwords.domian.gameplay.GamePlayPlayer
 import com.chrrissoft.inglishwords.domian.gameplay.GamePlayImpl
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Levels
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsManagerImpl
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsSettingsImpl
 import com.chrrissoft.inglishwords.domian.report.SessionReporterImpl
-import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWordImpl
+import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWord
 import com.chrrissoft.inglishwords.domian.gameplay.word.Word.EnglishWord
+import com.chrrissoft.inglishwords.domian.report.GamePlayDataCacheImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,11 +28,11 @@ class GamePlayViewModel @Inject constructor(
     private val levels = Levels(player)
     private val manager = LevelsManagerImpl(levels, settings, player)
     private val list = buildList {
-        add(EnglishWord("see", SpanishTranslatedWordImpl("ver")))
-        add(EnglishWord("love", SpanishTranslatedWordImpl("amor")))
-        add(EnglishWord("two", SpanishTranslatedWordImpl("dos")))
+        add(EnglishWord("see", SpanishTranslatedWord("ver")))
+        add(EnglishWord("get", SpanishTranslatedWord("dar")))
+//        add(EnglishWord("two", SpanishTranslatedWordImpl("dos")))
     }
-    private val session = SessionReporterImpl()
+    private val session = SessionReporterImpl(GamePlayDataCacheImpl(), SessionReportSaverImpl())
     private val game = GamePlayImpl(list, manager, session)
 
     private val _state = MutableStateFlow(GamePlayScreenState())

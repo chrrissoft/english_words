@@ -6,7 +6,7 @@ interface LevelsSettings {
 
     enum class Order {
         Interleaved, Random,
-        TranslationFirst, TranslationLast
+        NativeFirst, TargetFirst
     }
 
 }

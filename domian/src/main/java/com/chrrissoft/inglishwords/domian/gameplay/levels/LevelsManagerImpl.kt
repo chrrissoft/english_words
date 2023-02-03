@@ -9,11 +9,12 @@ import com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardLanguage
 import com.chrrissoft.inglishwords.domian.gameplay.keyboard.KeyboardState
 import com.chrrissoft.inglishwords.domian.gameplay.levels.LevelsSettings.Order.*
 import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.TargetWord
-import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.TranslatedWord
-import com.chrrissoft.inglishwords.domian.report.WordReport
+import com.chrrissoft.inglishwords.domian.gameplay.levels.Word.NativeWord
+import com.chrrissoft.inglishwords.domian.report.WordResult
 import com.chrrissoft.inglishwords.domian.gameplay.util.margeInterleave
 import com.chrrissoft.inglishwords.domian.gameplay.util.thereIsNext
-import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWordImpl
+import com.chrrissoft.inglishwords.domian.gameplay.word.TranslatedWord.SpanishTranslatedWord
+import com.chrrissoft.inglishwords.domian.report.WordResult.NativeText
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -35,16 +36,16 @@ class LevelsManagerImpl(
     private lateinit var currentWord: Word
     private lateinit var inputWords: List<Word>
     private val words = mutableListOf<Word>()
-    private val failedWords = mutableMapOf<Word, WordReport>()
+    private val failedWords = mutableMapOf<Word, WordResult>()
 
-    private val reports = mutableListOf<WordReport>()
+    private val reports = mutableListOf<WordResult>()
 
     private val _state = MutableStateFlow(GameState(Steps(levels.totalLevels)))
     override val state = _state.asStateFlow()
 
     private data class SplitWord(
         val target: List<TargetWord>,
-        val translation: List<TranslatedWord>
+        val translation: List<NativeWord>
     )
 
     init {
@@ -100,7 +101,7 @@ class LevelsManagerImpl(
         if (editor.failed) block()
     }
 
-    private fun addReport(report: WordReport) {
+    private fun addReport(report: WordResult) {
         reports.add(report)
     }
 
@@ -114,24 +115,32 @@ class LevelsManagerImpl(
         }
     }
 
-    override fun getReports(): List<WordReport> {
+    override fun getReports(): List<WordResult> {
         return reports
     }
 
-    private fun generateWordReport(level: Level): WordReport {
+    private fun generateWordReport(level: Level): WordResult {
         val editorReport = getEditorReport(level)
-        return WordReportImpl(
-            level = level.number,
-            text = currentWord.text,
-            time = editorReport.time,
-            index = currentWord.index,
-            mistakes = editorReport.mistakes,
-            failures = if (editorReport.failed) 1 else 0,
-            language = when (currentWord) {
-                is TargetWord -> WordReport.Language.Target
-                is TranslatedWord -> WordReport.Language.Translation
-            },
-        )
+        return when (currentWord) {
+            is TargetWord -> TargetWordResultImpl(
+                level = level.number,
+                targetText = WordResult.TargetText(currentWord.text),
+                time = editorReport.time,
+                index = currentWord.index,
+                mistakes = editorReport.mistakes,
+                nativeText = NativeText(currentWord.translation),
+                failures = if (editorReport.failed) 1 else 0,
+            )
+            is NativeWord -> NativeWordResultImpl(
+                level = level.number,
+                targetText = WordResult.TargetText(currentWord.text),
+                time = editorReport.time,
+                index = currentWord.index,
+                nativeText = NativeText(currentWord.translation),
+                mistakes = editorReport.mistakes,
+                failures = if (editorReport.failed) 1 else 0,
+            )
+        }
     }
 
     private fun getEditorReport(level: Level): EditorReport {
@@ -175,7 +184,7 @@ class LevelsManagerImpl(
     private fun updateState() {
         _state.update {
             it.copy(
-                translatedWord = currentWord.translated,
+                translatedWord = currentWord.translation,
                 words = it.words.advance()
             )
         }
@@ -197,12 +206,8 @@ class LevelsManagerImpl(
         _state.update { it.copy(replacement = value) }
     }
 
-    private fun thereNextWord(
-        word: Word, block: (Word) -> Unit
-    ): Boolean {
-        return words.thereIsNext(word) {
-            block(it)
-        }
+    private fun thereNextWord(word: Word, block: (Word) -> Unit): Boolean {
+        return words.thereIsNext(word) { block(it) }
     }
 
     private fun thereNextLevel(block: (Level) -> Unit): Boolean {
@@ -307,14 +312,14 @@ class LevelsManagerImpl(
         } else false
     }
 
-    private fun sumDeleteReport(word: Word, report: WordReport): WordReport {
+    private fun sumDeleteReport(word: Word, report: WordResult): WordResult {
         val value = failedWords.remove(word)
         requireNotNull(value)
         return value.sum(report)
     }
 
     private fun splitFailedWords(words: List<Word>): SplitWord {
-        val translation = words.filterIsInstance<TranslatedWord>()
+        val translation = words.filterIsInstance<NativeWord>()
         val target = words.filterIsInstance<TargetWord>()
         return SplitWord(target, translation)
     }
@@ -331,7 +336,7 @@ class LevelsManagerImpl(
             }
         )
         resetEditor(levels.firstLevel, currentWord.text)
-        setUpState(words.size, currentWord.translated)
+        setUpState(words.size, currentWord.translation)
     }
 
     private fun setUpState(
@@ -355,12 +360,12 @@ class LevelsManagerImpl(
     private fun splitWords(words: List<InputWord>): SplitWord {
         val translation = words
             .mapIndexed { i, word ->
-                TranslatedWord(
+                NativeWord(
                     index = i,
-                    translated = word.text,
+                    translation = word.text,
                     text = word.translation.text,
                     lang = when (word.translation) {
-                        is SpanishTranslatedWordImpl -> Word.Language.Spanish
+                        is SpanishTranslatedWord -> Word.Language.Spanish
                     }
                 )
             }
@@ -368,7 +373,7 @@ class LevelsManagerImpl(
             TargetWord(
                 index = i,
                 text = word.text,
-                translated = word.translation.text,
+                translation = word.translation.text,
                 lang = when (word) {
                     is InputWord.EnglishWord -> Word.Language.English
                 }
@@ -378,21 +383,13 @@ class LevelsManagerImpl(
     }
 
     private fun margeWords(
-        target: List<TargetWord>, translation: List<TranslatedWord>
+        target: List<TargetWord>, translation: List<NativeWord>
     ): List<Word> {
         return when (settings.order) {
-            Interleaved -> {
-                margeInterleave(target, translation)
-            }
-            Random -> {
-                margeInterleave(target, translation).shuffled()
-            }
-            TranslationFirst -> {
-                translation + target
-            }
-            TranslationLast -> {
-                target + translation
-            }
+            Interleaved -> margeInterleave(target, translation)
+            Random -> margeInterleave(target, translation).shuffled()
+            NativeFirst -> translation + target
+            TargetFirst -> target + translation
         }
     }
 

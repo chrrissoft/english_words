@@ -25,7 +25,7 @@ class EditorImpl(
         }
     }
 
-    private var time: Long = System.currentTimeMillis()
+    private var time = 0L
 
     override fun setText(text: String): Boolean {
         userText += text
@@ -67,6 +67,7 @@ class EditorImpl(
     }
 
     override fun reset(word: String) {
+        time = System.currentTimeMillis()
         userText = ""
         this.word = word
         _state.update { it.reset() }
